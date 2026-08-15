@@ -65,7 +65,7 @@ async fetchImageBitmap(basePath) {
         img.src = basePath + '.avif'; 
     });
 }
-
+```
 ---
 
 ## ⚙️ Setup do Foobar2000 + Now Playing 2
@@ -91,7 +91,8 @@ A arquitetura do nosso arquivo `player.js` depende de um formato muito estrito g
 
    ```text
    %title%|%artist%|%album%|%album artist%|%filename%
-
+   ```
+   
 ---
 
 ## ⚙️ Setup do OBS
