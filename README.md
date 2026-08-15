@@ -39,3 +39,14 @@ A arquitetura do nosso arquivo `player.js` depende de um formato muito estrito g
 
    ```text
    %title%|%artist%|%album%|%album artist%|%filename%
+   
+## ⚙️ Setup do OBS
+
+Para importar o sistema para o OBS, basta inserir uma Fonte de Navegador e marcar a opção **Arquivo Local** e configurar a resolução desejada. 
+
+<img width="1252" height="1140" alt="image" src="https://github.com/user-attachments/assets/fe53a266-7a2d-453b-8e35-e6ff2a6d0c93" />
+
+1. No OBS, adiciona uma nova **Fonte de Navegador**.
+2. Marque **"Arquivo Local"** e selecione o arquivo **index.html**.
+3. Digite a largura e a altura conforme a sua área de edição (O sistema automaticamente se reorganiza caso for colocado uma resolução vertical).
+4. Marque as opções **"Desativar fonte quando invisível"** e **"Atualizar o navegador quando a fonte se tornar ativa"**.
