@@ -1,6 +1,6 @@
 # Overlay Gremory-Playlist (OBS Studio)
 
-Este projeto é um Overlay Modular projetado especificamente para transmissões ao vivo via OBS Studio. Ele possui um fundo dinâmico e animado (WebGLLumaSlideshow), além de um player de música elegante que exibe informações de faixa em tempo real (Now Playing) e *cover arts*, sem depender de plataformas de streaming externas ou de widgets embutidos pesados no OBS.
+Este projeto é um Overlay Modular projetado especificamente para transmissões ao vivo via OBS Studio. Ele possui um fundo dinâmico e animado (WebGLLumaSlideshow que pode ser desativado, deixando o fundo transparente), além de um player de música elegante que exibe informações de faixa em tempo real (Now Playing) e *cover arts*(que também pode ser desativado), sem depender de plataformas de streaming externas ou de widgets embutidos pesados no OBS.
 
 Este sistema foi construído visando o máximo desempenho, delegando todo o trabalho pesado para a aceleração de hardware via CEF (Chromium Embedded Framework) e processamento WebGL.
 
