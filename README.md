@@ -2,8 +2,6 @@
 
 Este projeto é um Overlay Modular projetado especificamente para transmissões ao vivo via OBS Studio. Ele possui um fundo dinâmico e animado (WebGLLumaSlideshow que pode ser desativado, deixando o fundo transparente), além de um player de música elegante que exibe informações de faixa em tempo real (Now Playing) e *cover arts*(que também pode ser desativado), sem depender de plataformas de streaming externas ou de widgets embutidos pesados no OBS.
 
-Este sistema foi construído visando o máximo desempenho, delegando todo o trabalho pesado para a aceleração de hardware via CEF (Chromium Embedded Framework) e processamento WebGL.
-
 Para as *cover arts* funcionarem, elas necessitam ter o mesmo nome do arquivo de música.
 
 ## 🚀 Por que usar este sistema em vez de plugins externos (ex: Tuna)?
@@ -53,9 +51,8 @@ Para importar o sistema para o OBS, basta inserir uma Fonte de Navegador e marca
 3. Digite a largura e a altura conforme a sua área de edição (O sistema automaticamente se reorganiza caso for colocado uma resolução vertical).
 4. Marque as opções **"Desativar fonte quando invisível"** e **"Atualizar o navegador quando a fonte se tornar ativa"**.
 
+<img width="847" height="496" alt="image" src="https://github.com/user-attachments/assets/2b30af83-e1c4-44b9-a0ab-7489c0e41425" />
+
 Já para adicionar o áudio do Foobar2000:
 1. No OBS, adicione uma nova fonte de **"Captura de áudio de aplicativo (BETA)"**
 2. Selecione a janela do **Foobar2000**
-   
-<img width="847" height="496" alt="image" src="https://github.com/user-attachments/assets/2b30af83-e1c4-44b9-a0ab-7489c0e41425" />
-
