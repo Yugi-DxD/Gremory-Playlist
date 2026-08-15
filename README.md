@@ -2,7 +2,7 @@
 
 <img width="2560" height="1392" alt="image" src="https://github.com/user-attachments/assets/3e53efa1-c595-480e-aba6-b95a2552e8f5" />
 
-Este projeto é um Overlay Modular projetado especificamente para transmissões ao vivo via OBS Studio. Ele possui um fundo dinâmico e animado (WebGLLumaSlideshow que pode ser desativado, deixando o fundo transparente), além de um player de música elegante que exibe informações de faixa em tempo real (Now Playing) e *cover arts*(que também pode ser desativado), sem depender de plataformas de streaming externas ou de widgets embutidos pesados no OBS.
+Este projeto é um Overlay Modular projetado especificamente para transmissões ao vivo via OBS Studio. Ele possui um fundo dinâmico e animado (WebGLLumaSlideshow que pode ser desativado, deixando o fundo transparente), além de um player de música elegante que exibe informações de faixa em tempo real (Now Playing) e *cover arts*(que também pode ser desativado), sem depender de plataformas de streaming externas ou de widgets embutidos pesados no OBS. Sistema feito com conjunto com o Gemini 3.1 Pro.
 
 Para as *cover arts* funcionarem, elas necessitam ter o mesmo nome do arquivo de música.
 
