@@ -18,6 +18,26 @@ Plugins como o **Tuna** e ferramentas que se integram via WebSockets direto no O
 
 ---
 
+## 🖼️ Setup dos Backgrounds Animados (Slideshow)
+
+Para atingir o desempenho máximo e evitar que a GPU engasgue no event loop do OBS, o sistema de *fallback* automático de imagens (que procurava png, jpg, etc.) foi propositalmente **removido**. O sistema é burro e rápido: ele vai buscar o arquivo exato no lugar exato. Se você não seguir as regras abaixo, o fundo não carregará.
+
+### 1. Formato Exclusivo: `.avif`
+O script do WebGL lê **única e exclusivamente** arquivos no formato `.avif`. Não insira `.jpg`, `.png` ou `.webp`. Converta todos os seus *assets* de background previamente para `.avif`.
+
+### 2. Estrutura de Resolução (Pastas)
+O sistema lê automaticamente as dimensões da Fonte de Navegador que você definiu no OBS e puxa a imagem da pasta correspondente para economizar memória de vídeo (VRAM). Você deve organizar suas imagens nas seguintes pastas dentro do diretório `img/`:
+* `img/1080p/` → Para fontes dimensionadas até 1920x1080.
+* `img/1440p/` → Para fontes dimensionadas até 2560x1440 (Quad HD).
+* `img/2160p/` → Para fontes dimensionadas até 3840x2160 (4K).
+
+### 3. Orientação e Nomenclatura
+O layout ajusta sua física dependendo se a fonte é Vertical (ex: 2160x3840) ou Horizontal (ex: 3840x2160). As imagens também precisam respeitar essa orientação física. Nomeie as sequências a partir de `0`:
+* **No Overlay de Música:** Use os prefixos `h_DxD` (Horizontal) e `v_DxD` (Vertical). Ex: `h_DxD0.avif`, `h_DxD1.avif`.
+* **No Overlay Principal (HUD):** Use os prefixos `h_bg` (Horizontal) e `v_bg` (Vertical). Ex: `h_bg0.avif`, `h_bg1.avif`.
+
+---
+
 ## ⚙️ Setup do Foobar2000 + Now Playing 2
 
 Para que o overlay do player de música funcione perfeitamente, precisamos conectar o player local ao overlay web. Nós usamos o **Foobar2000** em conjunto com o componente **Now Playing 2**.
@@ -41,7 +61,9 @@ A arquitetura do nosso arquivo `player.js` depende de um formato muito estrito g
 
    ```text
    %title%|%artist%|%album%|%album artist%|%filename%
-   
+
+---
+
 ## ⚙️ Setup do OBS
 
 ### Passo 1: Importando o Overlay
