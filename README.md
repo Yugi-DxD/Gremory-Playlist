@@ -42,6 +42,8 @@ A arquitetura do nosso arquivo `player.js` depende de um formato muito estrito g
    
 ## ⚙️ Setup do OBS
 
+### Passo 1: Importando o Overlay
+
 Para importar o sistema para o OBS, basta inserir uma Fonte de Navegador e marcar a opção **Arquivo Local** e configurar a resolução desejada. 
 
 <img width="1252" height="1140" alt="image" src="https://github.com/user-attachments/assets/fe53a266-7a2d-453b-8e35-e6ff2a6d0c93" />
@@ -51,8 +53,12 @@ Para importar o sistema para o OBS, basta inserir uma Fonte de Navegador e marca
 3. Digite a largura e a altura conforme a sua área de edição (O sistema automaticamente se reorganiza caso for colocado uma resolução vertical).
 4. Marque as opções **"Desativar fonte quando invisível"** e **"Atualizar o navegador quando a fonte se tornar ativa"**.
 
-<img width="847" height="496" alt="image" src="https://github.com/user-attachments/assets/2b30af83-e1c4-44b9-a0ab-7489c0e41425" />
+### Passo 2: Adicionando o Áudio
 
 Já para adicionar o áudio do Foobar2000:
+
+<img width="847" height="496" alt="image" src="https://github.com/user-attachments/assets/2b30af83-e1c4-44b9-a0ab-7489c0e41425" />
+
+
 1. No OBS, adicione uma nova fonte de **"Captura de áudio de aplicativo (BETA)"**
 2. Selecione a janela do **Foobar2000**
