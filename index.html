@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Overlay Início - Modular</title>
+  <link rel="stylesheet" href="css/layout.css">
+</head>
+<body>
+  
+  <!-- PRE-WARM: Força a placa de vídeo a alocar a fonte de fallback japonesa na RAM imediatamente -->
+  <div style="position: absolute; opacity: 0; pointer-events: none; font-family: 'Cal Sans', 'Meiryo', 'MS Gothic', sans-serif;">『』</div>
+
+  <!-- DOM do Background -->
+  <div id="slideshow-wrapper">
+    <canvas id="glCanvas"></canvas>
+  </div>
+
+  <!-- DOM do Player -->
+  <div id="player-wrapper">
+    <div id="starting-soon-container">
+      <img src="img/loading_text.svg" alt="Loading..." class="bounce-svg">
+    </div>
+    <div class="cover-container">
+      <div class="cover-outline"></div>
+      <div class="cover-mask">
+        <img id="coverImg1" class="cover" src="placeholder.png" alt="" decoding="async">
+        <img id="coverImg2" class="cover hidden" src="" alt="" decoding="async">
+      </div>
+    </div>
+    <svg id="line1-svg" class="music-line">
+      <defs><linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd700"/><stop offset="100%" stop-color="#b89e14"/></linearGradient></defs>
+      <text id="svgText1-shadow" font-family="'Cal Sans', 'Meiryo', 'MS Gothic', sans-serif" fill="black" stroke="black" stroke-width="16" stroke-linejoin="round"></text>
+      <text id="svgText1" font-family="'Cal Sans', 'Meiryo', 'MS Gothic', sans-serif" fill="url(#grad1)"></text>
+    </svg>
+    <svg id="line2-svg" class="music-line">
+      <defs><linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd700"/><stop offset="100%" stop-color="#b89e14"/></linearGradient></defs>
+      <text id="svgText2-shadow" font-family="'Cal Sans', 'Meiryo', 'MS Gothic', sans-serif" fill="black" stroke="black" stroke-width="16" stroke-linejoin="round"></text>
+      <text id="svgText2" font-family="'Cal Sans', 'Meiryo', 'MS Gothic', sans-serif" fill="url(#grad2)"></text>
+    </svg>
+    <svg id="line3-svg" class="music-line">
+      <defs><linearGradient id="grad3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd700"/><stop offset="100%" stop-color="#b89e14"/></linearGradient></defs>
+      <text id="svgText3-shadow" font-family="'Cal Sans', 'Meiryo', 'MS Gothic', sans-serif" fill="black" stroke="black" stroke-width="16" stroke-linejoin="round"></text>
+      <text id="svgText3" font-family="'Cal Sans', 'Meiryo', 'MS Gothic', sans-serif" fill="url(#grad3)"></text>
+    </svg>
+  </div>
+  
+  <script src="js/config.js"></script>
+  <script src="js/background.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>
