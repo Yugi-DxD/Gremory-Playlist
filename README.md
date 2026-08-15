@@ -23,7 +23,7 @@ Para que o overlay do player de música funcione perfeitamente, precisamos conec
 ### Passo 1: Instalação do Componente
 
 1. Baixe e instale o [Foobar2000](https://www.foobar2000.org/).
-2. Faça o download do componente **Now Playing 2** (geralmente distribuído com extensão `.fb2k-component`).
+2. Faça o download do componente **[Now Playing 2](https://github.com/foxx1337/foo_nowplaying2)** (geralmente distribuído com extensão `.fb2k-component`).
 3. Abra o Foobar2000 e navegue até `File > Preferences > Components`.
 4. Clique em `Install...`, selecione o arquivo do Now Playing 2 baixado e aplique. O Foobar pedirá para reiniciar.
 
