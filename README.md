@@ -18,23 +18,53 @@ Plugins como o **Tuna** e ferramentas que se integram via WebSockets direto no O
 
 ---
 
-## 🖼️ Setup dos Backgrounds Animados (Slideshow)
+## 🖼️ Estrutura de Backgrounds e Resolução
 
-Para atingir o desempenho máximo e evitar que a GPU engasgue no event loop do OBS, o sistema de *fallback* automático de imagens (que procurava png, jpg, etc.) foi propositalmente **removido**. O sistema é burro e rápido: ele vai buscar o arquivo exato no lugar exato. Se você não seguir as regras abaixo, o fundo não carregará.
+O motor WebGL não redimensiona imagens às cegas. Ele é desenhado para carregar a resolução exata que o seu OBS está solicitando, evitando o desperdício de memória de vídeo (VRAM). Para que o slideshow funcione, você **deve** estruturar as pastas e renomear os arquivos seguindo as regras abaixo:
 
-### 1. Formato Exclusivo: `.avif`
-O script do WebGL lê **única e exclusivamente** arquivos no formato `.avif`. Não insira `.jpg`, `.png` ou `.webp`. Converta todos os seus *assets* de background previamente para `.avif`.
+### 1. Pastas de Resolução
+O script lê o eixo primário da sua tela (largura para horizontal, altura para vertical) e busca os arquivos na pasta respectiva. Você deve criar a seguinte estrutura dentro da pasta `img/`:
+* `img/1080p/` (Utilizado quando a fonte no OBS tem até 1920x1080)
+* `img/1440p/` (Utilizado quando a fonte no OBS tem até 2560x1440)
+* `img/2160p/` (Utilizado quando a fonte no OBS tem resolução 4K)
 
-### 2. Estrutura de Resolução (Pastas)
-O sistema lê automaticamente as dimensões da Fonte de Navegador que você definiu no OBS e puxa a imagem da pasta correspondente para economizar memória de vídeo (VRAM). Você deve organizar suas imagens nas seguintes pastas dentro do diretório `img/`:
-* `img/1080p/` → Para fontes dimensionadas até 1920x1080.
-* `img/1440p/` → Para fontes dimensionadas até 2560x1440 (Quad HD).
-* `img/2160p/` → Para fontes dimensionadas até 3840x2160 (4K).
+### 2. Nomenclatura e Orientação das Imagens
+O sistema separa inteligentemente as imagens horizontais das verticais, permitindo que você use o mesmo overlay para lives no YouTube/Twitch e no TikTok/Shorts. A contagem dos arquivos sempre deve iniciar no **zero**.
 
-### 3. Orientação e Nomenclatura
-O layout ajusta sua física dependendo se a fonte é Vertical (ex: 2160x3840) ou Horizontal (ex: 3840x2160). As imagens também precisam respeitar essa orientação física. Nomeie as sequências a partir de `0`:
-* **No Overlay de Música:** Use os prefixos `h_DxD` (Horizontal) e `v_DxD` (Vertical). Ex: `h_DxD0.avif`, `h_DxD1.avif`.
-* **No Overlay Principal (HUD):** Use os prefixos `h_bg` (Horizontal) e `v_bg` (Vertical). Ex: `h_bg0.avif`, `h_bg1.avif`.
+* **Overlay de Música (`background.js`):**
+  * Horizontal: `h_DxD0.avif`, `h_DxD1.avif`, `h_DxD2.avif`...
+  * Vertical: `v_DxD0.avif`, `v_DxD1.avif`, `v_DxD2.avif`...
+
+* **Overlay Principal da HUD (`slideshow.js`):**
+  * Horizontal: `h_bg0.avif`, `h_bg1.avif`, `h_bg2.avif`...
+  * Vertical: `v_bg0.avif`, `v_bg1.avif`, `v_bg2.avif`...
+
+A quantidade de imagens de cada eixo deve ser informada no respectivo arquivo `config.js` na propriedade `CONFIG.slideshow.imageCount`.
+
+---
+
+## ⚙️ Formatos de Imagem e Customização (.avif)
+
+Por padrão, este sistema roda de forma estrita utilizando **apenas a extensão `.avif`**. Esta foi uma decisão técnica arquitetural. Eliminar cadeias de fallback (tentar ler .webp, errar, tentar .png, errar, etc.) impede gargalos no sistema operacional e garante transições impecáveis a 60FPS. Além disso, o formato AVIF oferece a melhor compressão mantendo a máxima qualidade de cor.
+
+### Quer usar outros formatos (.jpg, .png, .webp)?
+Se por algum motivo você não pode converter seus arquivos para `.avif` e precisa utilizar outro formato, a alteração é simples, mas deve ser feita diretamente no código do motor.
+
+1. Abra os arquivos onde o motor de I/O opera: `js/background.js` e/ou `js/slideshow.js`.
+2. Localize a função assíncrona **`fetchImageBitmap(basePath)`**.
+3. Altere a string da extensão nas duas linhas finais do bloco:
+
+**Código original:**
+```javascript
+async fetchImageBitmap(basePath) {
+    return await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => createImageBitmap(img).then(resolve).catch(reject);
+        // Abaixo, substitua '.avif' pelo formato desejado (ex: '.webp' ou '.jpg')
+        img.onerror = () => reject(new Error(`I/O Falhou: Arquivo não encontrado -> ${basePath}.avif`));
+        img.src = basePath + '.avif'; 
+    });
+}
 
 ---
 
