@@ -46,7 +46,7 @@ Por padrão, este sistema roda de forma estrita utilizando **apenas a extensão 
 ### Quer usar outros formatos (.jpg, .png, .webp)?
 Se por algum motivo você não pode converter seus arquivos para `.avif` e precisa utilizar outro formato, a alteração é simples, mas deve ser feita diretamente no código do motor.
 
-1. Abra os arquivos onde o motor de I/O opera: `js/background.js` e/ou `js/slideshow.js`.
+1. Abra os arquivos onde o motor de I/O opera: `js/background.js`.
 2. Localize a função assíncrona **`fetchImageBitmap(basePath)`**.
 3. Altere a string da extensão nas duas linhas finais do bloco:
 
