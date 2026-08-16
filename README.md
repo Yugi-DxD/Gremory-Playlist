@@ -66,11 +66,13 @@ async fetchImageBitmap(basePath) {
 
 ## ⚙️ Setup do Foobar2000 + Now Playing 2
 
+Primeiramente, baixe a **[última versão do código fonte](https://github.com/Yugi-DxD/Gremory-Playlist/releases/tag/Gremory_Playlist_Overlay)**, e extraia o arquivo. A estrutura de pastas e arquivos já vem pronta para o pleno funcionamento do projeto.
+
 Para que o overlay do player de música funcione perfeitamente, precisamos conectar o player local ao overlay web. Nós usamos o **Foobar2000** em conjunto com o componente **Now Playing 2**.
 
 ### Passo 1: Instalação do Componente
 
-1. Baixe e instale o [Foobar2000](https://www.foobar2000.org/).
+1. Baixe e instale o **[Foobar2000](https://www.foobar2000.org/)**.
 2. Faça o download do componente **[Now Playing 2](https://github.com/foxx1337/foo_nowplaying2)** (geralmente distribuído com extensão `.fb2k-component`).
 3. Abra o Foobar2000 e navegue até `File > Preferences > Components`.
 4. Clique em `Install...`, selecione o arquivo do Now Playing 2 baixado e aplique. O Foobar pedirá para reiniciar.
