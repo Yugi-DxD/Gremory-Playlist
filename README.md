@@ -84,7 +84,7 @@ A arquitetura do nosso arquivo `player.js` depende de um formato muito estrito g
 <img width="740" height="546" alt="image" src="https://github.com/user-attachments/assets/0da42d4b-b0a5-4744-bc6e-ff7fc962a31a" />
 
 1. No Foobar2000, vá para `File > Preferences > Tools > Now Playing 2`.
-2. Na guia **Format String**, precisamos criar o output exato que o JavaScript do Overlay vai ler (Title, Artist, Album, Album Artist e Filename).
+2. Na guia **Format String**, precisamos criar o output exato que o JavaScript do Overlay vai ler (Title, Artist, Album, Album Artist e Filename). Vale lembrar que, essas devem ser as tags configuradas em cada arquivo de áudio.
 3. **Cole a seguinte formatação exata na caixa de texto do Output:**
 
    ```text
