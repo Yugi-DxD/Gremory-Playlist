@@ -7,41 +7,46 @@ class SakuraPetal {
     }
 
     reset(initial = false) {
-        // Inicializa as partículas distribuídas pela tela na primeira vez
-        // Depois, as pétalas mortas nascem apenas do canto inferior esquerdo
+        // ZONA DE NASCIMENTO: Agora preenche 100% do eixo X (largura) na parte inferior
         if (initial) {
             this.x = Math.random() * this.w;
             this.y = Math.random() * this.h;
         } else {
-            // Zona de nascimento: Canto inferior esquerdo (X negativo/baixo, Y alto/fora da tela)
-            this.x = (Math.random() * 400 - 200) * this.scale;
-            this.y = this.h + (Math.random() * 200) * this.scale;
+            this.x = Math.random() * this.w;
+            this.y = this.h + (Math.random() * 100) * this.scale;
         }
 
-        // Vetor de movimento (Para a direita e para cima)
-        this.vx = (Math.random() * 2.5 + 1.0) * this.scale; 
+        // VETOR DE MOVIMENTO: Subindo e derivando para a esquerda ou direita de forma caótica
+        this.vx = (Math.random() * 2 - 1) * this.scale; 
         this.vy = (Math.random() * -2.5 - 1.0) * this.scale; 
 
-        // Rotação 3D orgânica e Tamanho
-        this.size = (Math.random() * 0.7 + 0.4) * this.scale;
+        // ROTAÇÃO E ESCALA BASE
+        this.size = (Math.random() * 0.6 + 0.4) * this.scale;
         this.rotation = Math.random() * Math.PI * 2;
         this.rotationSpeed = (Math.random() * 0.04 - 0.02);
         
-        // Efeito de vento (Senoide)
+        // EFEITO 3D (TUMBLING): O segredo para parecer uma folha real caindo/subindo
+        this.flip = Math.random() * Math.PI * 2;
+        this.flipSpeed = Math.random() * 0.04 + 0.01;
+
+        // EFEITO DE VENTO: Movimento em "S" orgânico
         this.sway = Math.random() * Math.PI * 2;
         this.swaySpeed = Math.random() * 0.02 + 0.01;
         this.swayAmount = (Math.random() * 1.5 + 0.5) * this.scale;
     }
 
     update() {
-        // Aplica o vento sinuoso no eixo X
+        // Aplica a física
         this.x += this.vx + Math.sin(this.sway) * this.swayAmount;
         this.y += this.vy;
+        
+        // Incrementa os contadores de animação orgânica
         this.sway += this.swaySpeed;
         this.rotation += this.rotationSpeed;
+        this.flip += this.flipSpeed;
 
-        // Se sair pela direita ou pelo topo, mata a pétala e renasce
-        if (this.x > this.w + 100 * this.scale || this.y < -100 * this.scale) {
+        // Se sair pelo topo ou sumir pelas laterais, mata a pétala e renasce embaixo
+        if (this.y < -100 * this.scale || this.x < -100 * this.scale || this.x > this.w + 100 * this.scale) {
             this.reset(false);
         }
     }
@@ -50,7 +55,10 @@ class SakuraPetal {
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rotation);
-        ctx.scale(this.size, this.size);
+        
+        // A MÁGICA 3D: Achatar e inverter o eixo Y usando o Cosseno do flip.
+        // Como o Math.cos vai de 1 a -1, a folha encolhe, some e desenha invertida.
+        ctx.scale(this.size, this.size * Math.cos(this.flip));
 
         // Desenho vetorial curvado da pétala
         ctx.beginPath();
@@ -59,10 +67,10 @@ class SakuraPetal {
         ctx.bezierCurveTo(15, -35, 15, -15, 0, 0); 
         ctx.closePath();
         
-        // Degradê da pétala (Rosa Escuro para Rosa Claro)
+        // Degradê da pétala (Mais forte na base, mais claro na ponta)
         const grad = ctx.createLinearGradient(0, 0, 0, -45);
-        grad.addColorStop(0, "rgba(255, 183, 197, 0.9)"); 
-        grad.addColorStop(1, "rgba(255, 105, 135, 0.5)"); 
+        grad.addColorStop(0, "rgba(255, 183, 197, 0.95)"); 
+        grad.addColorStop(1, "rgba(255, 105, 135, 0.6)"); 
         
         ctx.fillStyle = grad;
         ctx.fill();
@@ -107,7 +115,6 @@ class SakuraEngine {
         this.canvas.width = this.width;
         this.canvas.height = this.height;
         
-        // Escalonador dinâmico: Pétalas terão o mesmo tamanho físico seja em 1080p ou 4K
         const isH = this.width > this.height;
         const baseW = isH ? 3840 : 2160;
         const baseH = isH ? 2160 : 3840;
