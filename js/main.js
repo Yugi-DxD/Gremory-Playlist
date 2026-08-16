@@ -29,13 +29,13 @@ function buildGlobalVignette() {
     const alpha = vConf.opacity;
     
     if (vConf.isVerticalVignette === 1) {
-        // Matemática linear idêntica ao WebGL
+        // Matemática linear para vertical
         const stop = vConf.size * 100;
         layer.style.background = `linear-gradient(to bottom, rgba(${rgb}, 0) 0%, rgba(${rgb}, ${alpha}) ${stop}%)`;
     } else {
-        // Matemática radial idêntica ao WebGL
+        // CORREÇÃO: Substituição de 'circle' por 'ellipse' para acompanhar o aspect ratio 16:9
         const stop = vConf.size * 200;
-        layer.style.background = `radial-gradient(circle at center, rgba(${rgb}, 0) 40%, rgba(${rgb}, ${alpha}) ${stop}%)`;
+        layer.style.background = `radial-gradient(ellipse at center, rgba(${rgb}, 0) 40%, rgba(${rgb}, ${alpha}) ${stop}%)`;
     }
     
     layer.style.mixBlendMode = vConf.blendMode;
