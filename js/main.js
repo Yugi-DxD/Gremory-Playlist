@@ -1,7 +1,9 @@
-// 1. Inicia o WebGL SOMENTE se autorizado pelo config.js
+// 1. Inicia o WebGL de forma assíncrona SOMENTE se autorizado pelo config.js
 let slideshowInstance = null;
 if (CONFIG.slideshow.enabled !== false) {
-    slideshowInstance = initBackground();
+    initBackground().then(instance => {
+        slideshowInstance = instance;
+    });
 } else {
     // Aborta a renderização e arranca o container do DOM
     document.getElementById('slideshow-wrapper').style.display = 'none';
@@ -32,7 +34,10 @@ window.addEventListener('resize', () => {
         return;
     }
     
-    // A checagem if(slideshowInstance) impede que o código quebre caso o fundo esteja desativado
-    if (slideshowInstance) slideshowInstance.resize();
+    // Trava de segurança: impede o resize de disparar num canvas não iniciado
+    if (slideshowInstance && slideshowInstance.isReady) {
+        slideshowInstance.resize();
+    }
+    
     scaleOverlay();
 });
