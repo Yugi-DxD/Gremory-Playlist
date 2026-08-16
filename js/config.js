@@ -34,5 +34,9 @@ const CONFIG = deepFreeze({
     player: { 
         showCoverArt: true, // <--- TRAVA MESTRA DA COVER ART: true liga, false desliga
         interval: 2000 
+    },
+    sakura: {
+        enabled: true,      // <--- TRAVA MESTRA: true liga as pétalas, false desliga
+        particleCount: 50   // Quantidade de folhas simultâneas na tela
     }
 });
