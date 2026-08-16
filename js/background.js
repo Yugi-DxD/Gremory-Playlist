@@ -1,8 +1,4 @@
 class LumaSlideshow {
-    // A classe exata que você escreveu no seu LumaFade Background original, 
-    // com todos os métodos de WebGL inalterados. Cole a classe inteira aqui.
-    // Removi do snippet para não poluir, mas a estrutura começa no constructor()...
-
     constructor(canvasId, imagesArray, config) {
         this.canvas = document.getElementById(canvasId);
         this.gl = this.canvas.getContext('webgl2', { 
@@ -17,85 +13,48 @@ class LumaSlideshow {
         
         this.isTransitioning = false;
         this.transitionStartTime = 0;
+        this.isReady = false; // Flag de segurança de estado
         
         this.renderLoop = this.renderLoop.bind(this);
         this.resize = this.resize.bind(this);
-        
-        this.initWebGL(); 
-        this.startSlideshow();
     }
 
-initWebGL() {
+    // Inicialização assíncrona que importa os shaders externos
+    async init() {
+        try {
+            const [vsRes, fsRes] = await Promise.all([
+                fetch('shaders/luma.vert', { cache: "no-store" }),
+                fetch('shaders/luma.frag', { cache: "no-store" })
+            ]);
+            
+            if (!vsRes.ok || !fsRes.ok) throw new Error("Erro de I/O ao importar shaders.");
+            
+            const vsSource = await vsRes.text();
+            const fsSource = await fsRes.text();
+            
+            this.initWebGL(vsSource, fsSource);
+            this.isReady = true;
+            this.startSlideshow();
+        } catch (e) {
+            console.error("[WebGL Boot] Falha crítica ao iniciar LumaSlideshow:", e);
+        }
+    }
+
+    initWebGL(vsSource, fsSource) {
         const gl = this.gl;
-        const vsSource = `attribute vec2 position; varying vec2 vUv; void main() { vUv = position * 0.5 + 0.5; vUv.y = 1.0 - vUv.y; gl_Position = vec4(position, 0.0, 1.0); }`;
-        const fsSource = `
-            precision highp float; varying vec2 vUv;
-            uniform sampler2D texCurrent; uniform sampler2D texNext;
-            uniform float progress; uniform float softness;
-            
-            uniform vec2 resCurrent; uniform vec2 resNext; uniform vec2 canvasRes;
-            uniform vec3 u_vColor; uniform float u_vSize; uniform float u_vOpacity;
-            
-            // Variáveis float estáveis para o CEF
-            uniform float u_vBlend; 
-            uniform float u_invertLuma; 
-            uniform float u_isVerticalVignette;
-
-            vec2 coverUv(vec2 uv, vec2 texRes) {
-                vec2 ratio = canvasRes / texRes; float maxRatio = max(ratio.x, ratio.y);
-                vec2 scale = vec2(maxRatio / ratio.x, maxRatio / ratio.y);
-                return (uv - 0.5) / scale + 0.5;
-            }
-            
-            float luma(vec3 color) { return dot(color, vec3(0.299, 0.587, 0.114)); }
-
-            void main() {
-                vec2 uvC = coverUv(vUv, resCurrent); vec2 uvN = coverUv(vUv, resNext);
-                vec4 colorC = texture2D(texCurrent, uvC); vec4 colorN = texture2D(texNext, uvN);
-                
-                float l = luma(colorC.rgb); 
-                
-                // CORREÇÃO: Limiar matemático tolerante
-                if (u_invertLuma > 0.5) { l = 1.0 - l; }
-                
-                float p = progress * (1.0 + softness) - softness;
-                float mixFactor = 1.0 - smoothstep(p, p + softness, l);
-                vec4 finalColor = mix(colorC, colorN, mixFactor);
-                
-                float vFactor = 0.0;
-                
-                // CORREÇÃO: Limiar matemático tolerante
-                if (u_isVerticalVignette > 0.5) { 
-                    vFactor = smoothstep(0.0, u_vSize, vUv.y) * u_vOpacity; 
-                } else { 
-                    float dist = distance(vUv, vec2(0.5, 0.5)); 
-                    vFactor = smoothstep(0.2, u_vSize, dist) * u_vOpacity; 
-                }
-
-                vec3 baseColor = finalColor.rgb; vec3 vColor = u_vColor;
-                
-                // CORREÇÃO DEFINITIVA DO BLEND MODE: Zonas de tolerância para os floats
-                if (u_vBlend > 0.5 && u_vBlend < 1.5) { 
-                    // 1.0 - MULTIPLY
-                    finalColor.rgb = baseColor * mix(vec3(1.0), vColor, vFactor); 
-                } else if (u_vBlend > 1.5) { 
-                    // 2.0 - SCREEN (Formatado matematicamente com vec3 explícito)
-                    finalColor.rgb = mix(baseColor, vec3(1.0) - (vec3(1.0) - baseColor) * (vec3(1.0) - vColor), vFactor); 
-                } else { 
-                    // 0.0 - NORMAL
-                    finalColor.rgb = mix(baseColor, vColor, vFactor); 
-                }
-                
-                gl_FragColor = finalColor;
-            }
-        `;
         
         const compile = (type, src) => {
             const s = gl.createShader(type); gl.shaderSource(s, src);
-            gl.compileShader(s); return s;
+            gl.compileShader(s); 
+            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                console.error("Shader Compile Error:", gl.getShaderInfoLog(s));
+            }
+            return s;
         };
+
         const vs = compile(gl.VERTEX_SHADER, vsSource);
         const fs = compile(gl.FRAGMENT_SHADER, fsSource);
+        
         this.program = gl.createProgram(); 
         gl.attachShader(this.program, vs); gl.attachShader(this.program, fs); 
         gl.linkProgram(this.program); gl.useProgram(this.program);
@@ -122,7 +81,6 @@ initWebGL() {
         gl.uniform1f(gl.getUniformLocation(this.program, 'u_vSize'), vConf.size);
         gl.uniform1f(gl.getUniformLocation(this.program, 'u_vOpacity'), vConf.opacity);
         
-        // MUDANÇA CRÍTICA: Tratamento da string e envio de floats precisos para os shaders.
         const modeStr = (vConf.blendMode || 'multiply').toLowerCase().trim();
         const modeFloat = modeStr === 'screen' ? 2.0 : (modeStr === 'normal' ? 0.0 : 1.0);
         
@@ -151,7 +109,6 @@ initWebGL() {
         this.draw(0.0);
     }
 
-    // Método de I/O refatorado para ler exclusivamente .avif
     async fetchImageBitmap(basePath) {
         return await new Promise((resolve, reject) => {
             const img = new Image();
@@ -166,7 +123,6 @@ initWebGL() {
             const sync = this.getGlobalSyncData(0); 
             const bag = this.generateSeededBag(sync.cycleSeed, this.imagesUrls.length);
             
-            // Atualizado para usar o novo método fetchImageBitmap
             const currentBitmap = await this.fetchImageBitmap(this.imagesUrls[bag[sync.indexInCycle]]);
             this.updateTextureObj(this.texA, this.resA, currentBitmap);
             this.draw(0.0);
@@ -174,7 +130,6 @@ initWebGL() {
             this.preloadAndScheduleNext();
         } catch (e) {
             console.error("[I/O Error] Falha ao iniciar ciclo de imagens.", e);
-            // Tolerância a falhas mantida
             this.preloadAndScheduleNext();
         }
     }
@@ -187,7 +142,6 @@ initWebGL() {
         const targetTex = this.activeTexId === 0 ? this.texB : this.texA;
         const targetRes = this.activeTexId === 0 ? this.resB : this.resA;
 
-        // Atualizado para usar o novo método fetchImageBitmap
         this.fetchImageBitmap(this.imagesUrls[nextIndex]).then(bitmap => {
             this.updateTextureObj(targetTex, targetRes, bitmap);
             
@@ -225,7 +179,6 @@ initWebGL() {
             this.activeTexId = this.activeTexId === 0 ? 1 : 0; 
             this.draw(0.0); 
             
-            // Condição de corrida aniquilada. Nova imagem só é chamada após a transição terminar.
             this.preloadAndScheduleNext(); 
         }
     }
@@ -238,7 +191,6 @@ initWebGL() {
         bitmap.close(); 
     }
 
-    // Motor RNG Semeado (Mulberry32) - Oscilador determinístico
     seededRandom(seed) {
         let a = seed;
         return function() {
@@ -249,7 +201,6 @@ initWebGL() {
         }
     }
 
-    // Gera o mesmo baralho embaralhado em todos os overlays baseando-se no ciclo temporal
     generateSeededBag(seed, count) {
         const createBag = (s) => {
             let arr = Array.from({ length: count }, (_, i) => i);
@@ -262,8 +213,6 @@ initWebGL() {
         };
 
         let currentBag = createBag(seed);
-        
-        // Trava matemática: Impede que a 1ª imagem do novo ciclo seja igual à última do anterior
         if (seed > 0) {
             let prevBag = createBag(seed - 1);
             if (currentBag[0] === prevBag[count - 1] && count > 1) {
@@ -288,32 +237,30 @@ initWebGL() {
 
     draw(progress = 0.0) {
         const gl = this.gl;
-
-        gl.clearColor(0.0, 0.0, 0.0, 0.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-
         const texC = this.activeTexId === 0 ? this.texA : this.texB;
         const texN = this.activeTexId === 0 ? this.texB : this.texA;
         const resC = this.activeTexId === 0 ? this.resA : this.resB;
         const resN = this.activeTexId === 0 ? this.resB : this.resA;
         
-        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texC);
-        gl.uniform2f(this.uResCurrent, resC[0], resC[1]);
-        gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, texN);
-        gl.uniform2f(this.uResNext, resN[0], resN[1]);
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texC); gl.uniform2f(this.uResCurrent, resC[0], resC[1]);
+        gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, texN); gl.uniform2f(this.uResNext, resN[0], resN[1]);
         gl.uniform1f(this.uProgress, progress);
         
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
 }
 
-function initBackground() {
+// O motor agora é assíncrono para dar suporte ao Fetch dos shaders
+async function initBackground() {
     const prefix = IS_VERTICAL ? 'v_DxD' : 'h_DxD';
-    
-    // Define o limite correto consultando o novo objeto no config.js
     const maxCount = IS_VERTICAL ? CONFIG.slideshow.imageCount.vertical : CONFIG.slideshow.imageCount.horizontal;
     
     const slideImages = Array.from({ length: maxCount }, (_, i) => `img/${ASSET_FOLDER}/${prefix}${i}`);
     
-    return new LumaSlideshow('glCanvas', slideImages, CONFIG.slideshow);
+    const engine = new LumaSlideshow('glCanvas', slideImages, CONFIG.slideshow);
+    await engine.init(); 
+    return engine;
 }
