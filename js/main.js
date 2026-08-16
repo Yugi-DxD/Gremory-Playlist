@@ -9,6 +9,16 @@ if (CONFIG.slideshow.enabled !== false) {
     document.getElementById('slideshow-wrapper').style.display = 'none';
 }
 
+// MÓDULO SAKURA: Inicia a engine 2D SOMENTE se autorizado no config
+let sakuraInstance = null;
+if (CONFIG.sakura && CONFIG.sakura.enabled !== false) {
+    sakuraInstance = new SakuraEngine('sakuraCanvas', CONFIG.sakura);
+    sakuraInstance.init();
+} else {
+    const sc = document.getElementById('sakuraCanvas');
+    if (sc) sc.style.display = 'none';
+}
+
 // 2. Carrega a fonte via JS e bloqueia a inicialização do Player
 const calSansFont = new FontFace('Cal Sans', 'url(CalSans-Regular.ttf)');
 
@@ -37,6 +47,11 @@ window.addEventListener('resize', () => {
     // Trava de segurança: impede o resize de disparar num canvas não iniciado
     if (slideshowInstance && slideshowInstance.isReady) {
         slideshowInstance.resize();
+    }
+
+    // Repassa o redimensionamento dinâmico para a matriz 2D das pétalas
+    if (sakuraInstance && sakuraInstance.isReady) {
+        sakuraInstance.resize();
     }
     
     scaleOverlay();
