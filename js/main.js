@@ -19,7 +19,30 @@ if (CONFIG.sakura && CONFIG.sakura.enabled !== false) {
     if (sc) sc.style.display = 'none';
 }
 
-// 2. Carrega a fonte via JS e bloqueia a inicialização do Player
+// 2. Transfere a Vinheta do WebGL para o CSS
+function buildGlobalVignette() {
+    const vConf = CONFIG.slideshow.vignette;
+    const layer = document.getElementById('vignette-layer');
+    if (!layer || !vConf) return;
+
+    const rgb = `${vConf.color.r}, ${vConf.color.g}, ${vConf.color.b}`;
+    const alpha = vConf.opacity;
+    
+    if (vConf.isVerticalVignette === 1) {
+        // Matemática linear idêntica ao WebGL
+        const stop = vConf.size * 100;
+        layer.style.background = `linear-gradient(to bottom, rgba(${rgb}, 0) 0%, rgba(${rgb}, ${alpha}) ${stop}%)`;
+    } else {
+        // Matemática radial idêntica ao WebGL
+        const stop = vConf.size * 200;
+        layer.style.background = `radial-gradient(circle at center, rgba(${rgb}, 0) 40%, rgba(${rgb}, ${alpha}) ${stop}%)`;
+    }
+    
+    layer.style.mixBlendMode = vConf.blendMode;
+}
+buildGlobalVignette();
+
+// 3. Carrega a fonte via JS e bloqueia a inicialização do Player
 const calSansFont = new FontFace('Cal Sans', 'url(CalSans-Regular.ttf)');
 
 calSansFont.load().then((loadedFont) => {
@@ -53,6 +76,6 @@ window.addEventListener('resize', () => {
     if (sakuraInstance && sakuraInstance.isReady) {
         sakuraInstance.resize();
     }
-    
+    buildGlobalVignette(); // Recalcula a vinheta no resize
     scaleOverlay();
 });
