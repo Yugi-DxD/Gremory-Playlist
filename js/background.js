@@ -79,7 +79,9 @@ class LumaSlideshow {
         const vConf = this.config.vignette;
         gl.uniform3f(gl.getUniformLocation(this.program, 'u_vColor'), vConf.color.r/255, vConf.color.g/255, vConf.color.b/255);
         gl.uniform1f(gl.getUniformLocation(this.program, 'u_vSize'), vConf.size);
-        gl.uniform1f(gl.getUniformLocation(this.program, 'u_vOpacity'), vConf.opacity);
+        // Forçamos a opacidade da vinheta do WebGL para ZERO. 
+        // O efeito visual agora é inteiramente gerenciado pela camada CSS global.
+        gl.uniform1f(gl.getUniformLocation(this.program, 'u_vOpacity'), 0.0);
         
         const modeStr = (vConf.blendMode || 'multiply').toLowerCase().trim();
         const modeFloat = modeStr === 'screen' ? 2.0 : (modeStr === 'normal' ? 0.0 : 1.0);
