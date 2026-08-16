@@ -86,3 +86,10 @@ svg.music-line {
     pointer-events: none;
     contain: strict;
 }
+
+/* MÓDULO: VINHETA GLOBAL */
+#vignette-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 3; /* Cobre o fundo e as sakuras */
+    pointer-events: none; contain: strict;
+}
