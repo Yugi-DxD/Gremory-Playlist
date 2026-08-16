@@ -88,7 +88,7 @@ A arquitetura do nosso arquivo `player.js` depende de um formato muito estrito g
    ```text
    %title%|%artist%|%album%|%album artist%|%filename%
    ```
-4. Certifique-se de salvar o arquivo (`now_playing.txt`) na raiz da pasta, junto com o arquivo (`index.html`)
+4. Certifique-se de salvar o arquivo (`now_playing.txt`) na raiz da pasta, junto com o arquivo (`index.html`).
 ---
 
 ## ⚙️ Setup do OBS
