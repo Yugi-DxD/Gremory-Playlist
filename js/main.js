@@ -1,24 +1,20 @@
-// 1. Inicia o WebGL de forma assíncrona SOMENTE se autorizado pelo config.js
+// Cada módulo inicializa de forma independente.
 let slideshowInstance = null;
-if (CONFIG.slideshow.enabled !== false) {
-    initBackground().then(instance => {
-        slideshowInstance = instance;
-    });
-} else {
-    // Aborta a renderização e arranca o container do DOM
-    document.getElementById('slideshow-wrapper').style.display = 'none';
-}
-
-// MÓDULO SAKURA: Inicia a engine 2D SOMENTE se autorizado no config
 let sakuraInstance = null;
-if (CONFIG.sakura && CONFIG.sakura.enabled !== false) {
-    sakuraInstance = new SakuraEngine('sakuraCanvas', CONFIG.sakura);
-    sakuraInstance.init();
-} else {
-    const sc = document.getElementById('sakuraCanvas');
-    if (sc) sc.style.display = 'none';
+function boot(name, callback) {
+    Promise.resolve().then(callback).catch(error => OverlayRuntime.report(name, error.message, true));
 }
-
+boot('Player', () => initPlayer());
+boot('Fundo', async () => {
+    if (CONFIG.slideshow.enabled !== false) slideshowInstance = await initBackground();
+    else document.getElementById('slideshow-wrapper').style.display = 'none';
+});
+boot('Sakura', () => {
+    if (CONFIG.sakura && CONFIG.sakura.enabled !== false) {
+        sakuraInstance = new SakuraEngine('sakuraCanvas', CONFIG.sakura);
+        sakuraInstance.init();
+    } else document.getElementById('sakuraCanvas').style.display = 'none';
+});
 // 2. Transfere a Vinheta do WebGL para o CSS
 function buildGlobalVignette() {
     const vConf = CONFIG.slideshow.vignette;
@@ -40,42 +36,24 @@ function buildGlobalVignette() {
     
     layer.style.mixBlendMode = vConf.blendMode;
 }
-buildGlobalVignette();
+boot('Vinheta', buildGlobalVignette);
 
-// 3. Carrega a fonte via JS e bloqueia a inicialização do Player
-const calSansFont = new FontFace('Cal Sans', 'url(CalSans-Regular.ttf)');
 
-calSansFont.load().then((loadedFont) => {
-    document.fonts.add(loadedFont);
-    initPlayer(); // O Player SÓ liga quando a fonte já estiver na RAM
-}).catch((err) => {
-    console.error("Falha bruta de I/O na fonte. Iniciando em modo de emergência:", err);
-    initPlayer(); 
+// Fonte preferida carrega em paralelo, sem bloquear o player.
+boot('Fonte', async () => {
+    const font = new FontFace('Cal Sans', 'url(CalSans-Regular.ttf)');
+    const loaded = await font.load();
+    document.fonts.add(loaded);
+    OverlayRuntime.report('Fonte', 'Cal Sans carregada.');
 });
 
-// 3. Listener centralizado
 window.addEventListener('resize', () => {
-    const newIsVert = window.innerHeight > window.innerWidth;
-    const currentPrimaryAxis = newIsVert ? window.innerHeight : window.innerWidth;
-    
-    let newFolder = "2160p";
-    if (currentPrimaryAxis <= 1920) newFolder = "1080p";
-    else if (currentPrimaryAxis <= 2560) newFolder = "1440p";
-    
-    if (newIsVert !== IS_VERTICAL || newFolder !== ASSET_FOLDER) {
-        window.location.reload(); 
-        return;
-    }
-    
-    // Trava de segurança: impede o resize de disparar num canvas não iniciado
-    if (slideshowInstance && slideshowInstance.isReady) {
-        slideshowInstance.resize();
-    }
-
-    // Repassa o redimensionamento dinâmico para a matriz 2D das pétalas
-    if (sakuraInstance && sakuraInstance.isReady) {
-        sakuraInstance.resize();
-    }
-    buildGlobalVignette(); // Recalcula a vinheta no resize
+    const vertical = window.innerHeight > window.innerWidth;
+    const axis = vertical ? window.innerHeight : window.innerWidth;
+    const folder = axis <= 1920 ? '1080p' : axis <= 2560 ? '1440p' : '2160p';
+    if (vertical !== IS_VERTICAL || folder !== ASSET_FOLDER) { location.reload(); return; }
+    if (slideshowInstance?.isReady) slideshowInstance.resize();
+    if (sakuraInstance?.isReady) sakuraInstance.resize();
+    buildGlobalVignette();
     scaleOverlay();
 });
