@@ -14,6 +14,7 @@ else if (primaryAxis <= 2560) ASSET_FOLDER = "1440p";
 
 const CONFIG = deepFreeze({
     slideshow: {
+        renderer: "auto", // auto: WebGL2/1; webgl1: força WebGL1; css: crossfade sem LumaFade
         enabled: true, // <--- TRAVA MESTRA DO BACKGROUND: true liga, false desliga
         imageCount: {
             horizontal: 97,
@@ -25,7 +26,7 @@ const CONFIG = deepFreeze({
         invertLuma: true,
         vignette: {
             color: { r: 33, g: 13, b: 32 }, 
-            size: IS_VERTICAL ? 0.8 : 0.6,  
+            size: IS_VERTICAL ? 0.8 : 0.4,  
             opacity: 1.0, 
             blendMode: 'multiply', 
             isVerticalVignette: IS_VERTICAL ? 1 : 0
