@@ -82,6 +82,7 @@ class SakuraEngine {
     constructor(canvasId, config) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d', { alpha: true, desynchronized: true });
+        if (!this.ctx) throw new Error('Canvas 2D indisponível para Sakura');
         this.config = config;
         this.particles = [];
         this.rAF = null;
